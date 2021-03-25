@@ -34,6 +34,7 @@ async function pdfGetPageProperties(sdk, pdfDoc) {
       height: cropBox.top,
       rotation: pageRotation
     };
+    pdfPage.Release();
   }
 
   return pageProperties;

@@ -39,6 +39,36 @@ const { pdfGetPageProperties } = require(config.pdfixModulesPath + 'pdfGetPagePr
  * @const {module} pdfRenderPage
  */
 const { pdfRenderPage } = require(config.pdfixModulesPath + 'pdfRenderPage.js');
+/**
+ * pdfExtractPageMap module.
+ * @const {module} pdfExtractPageMap
+ */
+const { pdfExtractPageMap } = require(config.pdfixModulesPath + 'pdfExtractPageMap.js');
+/**
+ * pdfGetBookmarks module.
+ * @const {module} pdfGetBookmarks
+ */
+const { pdfGetBookmarks } = require(config.pdfixModulesPath + 'pdfGetBookmarks.js');
+/**
+ * pdfGetNamedDestinations module.
+ * @const {module} pdfGetNamedDestinations
+ */
+const { pdfGetNamedDestinations } = require(config.pdfixModulesPath + 'pdfGetNamedDestinations.js');
+/**
+ * pdfGetPageAnnots module.
+ * @const {module} pdfGetPageAnnots
+ */
+const { pdfGetPageAnnots } = require(config.pdfixModulesPath + 'pdfGetPageAnnots.js');
+/**
+ * pdfGetPageContent module.
+ * @const {module} pdfGetPageContent
+ */
+const { pdfGetPageContent } = require(config.pdfixModulesPath + 'pdfGetPageContent.js');
+/**
+ * pdfRedact module.
+ * @const {module} pdfRedact
+ */
+const { pdfRedact } = require(config.pdfixModulesPath + 'pdfRedact.js');
 
 /**
  * WASM instance of the PDFix SDK.
@@ -88,14 +118,14 @@ function doSample() {
     type: 'psOpenFileFs',
     file: config.pdfixWasmSampleFile
   };
-  pdfOpenDoc( PDFIX_SDK, openDocData ).then(function(pdfDoc) {
-    console.log("Sample PDF document opened...");
+  pdfOpenDoc( PDFIX_SDK, openDocData ).then((pdfDoc) => {
+    console.log("\nSample PDF document opened...");
 
-    console.log("Getting page properties...");
-    pdfGetPageProperties(PDFIX_SDK, pdfDoc).then(function(data) {
-      console.log(data);
+    console.log("\nGetting page properties...");
+    pdfGetPageProperties(PDFIX_SDK, pdfDoc).then((pageProperties) => {
+      console.log(pageProperties);
 
-      console.log("Page render sample...");
+      console.log("\nPage render sample...");
       let sampleRenderParams = {
         segmentId: 0,
         page: 1,
@@ -108,14 +138,84 @@ function doSample() {
         top: 0,
         left: 0
       };
-      console.log("Sample render parameters:");
+      console.log("\nSample render parameters:");
       console.log(sampleRenderParams);
-      pdfRenderPage(PDFIX_SDK, pdfDoc, sampleRenderParams).then(function(base64) {
+      pdfRenderPage(PDFIX_SDK, pdfDoc, sampleRenderParams).then((base64) => {
         console.log("Page render sample response data:");
         console.log(base64);
-        console.log("Exiting sample...");
-        process.exit();
+
+        console.log("\nExtracting page map... (page 1)");
+        pdfExtractPageMap( PDFIX_SDK, pdfDoc, {pageNumber: 1} ).then((pageMap) => {
+          console.log(pageMap);
+
+          console.log("\nGetting document bookmarks...");
+          pdfGetBookmarks( PDFIX_SDK, pdfDoc ).then((docBookmarks) => {
+            console.log(docBookmarks);
+
+            console.log("\nGetting document named destinations...");
+            pdfGetNamedDestinations( PDFIX_SDK, pdfDoc ).then((namedDestinations) => {
+              console.log(namedDestinations);
+
+              console.log("\nGetting page annotations... (page 1)");
+              let requestData = {
+                pageNumber: 1,
+                annotSubtypes: ['Widget', 'Link', 'Redact']
+              };
+              pdfGetPageAnnots( PDFIX_SDK, pdfDoc, requestData ).then((pageAnnots) => {
+                console.log(pageAnnots);
+
+                console.log("\nGetting page content... (page 1)");
+                pdfGetPageContent(PDFIX_SDK, pdfDoc, 1).then((pageContent) => {
+                  console.log(pageContent);
+
+                  console.log("\nCreating and applying sample redaction...");
+                  let sampleRedactQuery = {
+                    query: 'createRedactionMarks',
+                    selection: [{
+                      pageNumber: 1,
+                      kids: [{
+                        type: 'rect',
+                        fill: 'rgba(0, 0, 0, 1)',
+                        height: 71,
+                        left: 31,
+                        stroke: '#000000',
+                        strokeWidth: 1,
+                        top: 31,
+                        width: 151,
+                        data: {
+                          overlayText: 'TEXT',
+                          overlayTextAlignment: 'left',
+                          overlayTextFont: 'Helvetica',
+                          overlayTextFontColor: '#000000',
+                          overlayTextFontSize: 10,
+                          redactedAreaFillColor: '#000000',
+                          redactionMarkFillColor: '#000000',
+                          redactionMarkFillOpacity: 100,
+                          redactionMarkOutlineColor: '#000000',
+                          repeatOverlayText: false,
+                          useOverlayText: true
+                        }
+                      }]
+                    }]
+                  };
+                  pdfRedact( PDFIX_SDK, pdfDoc, sampleRedactQuery ).then((data) => {
+                    console.log(data);
+                    let applyRedactionRequest = {
+                      query: 'applyRedaction'
+                    };
+                    pdfRedact( PDFIX_SDK, pdfDoc, applyRedactionRequest ).then((data) => {
+                      console.log(data);
+                    });
+                  });
+
+                });
+              });
+            });
+          });
+        });
+
       });
+
     });
   });
 

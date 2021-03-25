@@ -10,11 +10,11 @@ function streamToString(sdk, toStrFunc, saveToStream){
   return str;
 }
 
-async function pdfToHtml(sdk, pdfDoc, rp){
+async function pdfToHtml(sdk, pdfDoc) {
   var pdfix = sdk.GetPdfix();
   var accountAuth = pdfix.GetAccountAuthorization();
-  const [emailPtr, emailLength] = sdk.allocString(""); // LICENSE E-MAIL
-  const [keyPtr, keyLength] = sdk.allocString(""); // LICENSE KEY
+  const [emailPtr, emailLength] = sdk.allocString('<---LICENSE EMAIL--->');
+  const [keyPtr, keyLength] = sdk.allocString('<---LICENSE KEY--->');
   accountAuth.Authorize(emailPtr, keyPtr);
 
   var pdfToHtml = sdk.GetPdfToHtml();

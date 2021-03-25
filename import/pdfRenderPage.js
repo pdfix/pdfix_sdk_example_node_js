@@ -86,6 +86,11 @@ async function pdfRenderPage(sdk, pdfDoc, renderParams) {
     format: renderParams.format,
     base64: str_pic
   }
+
+  pdfPage.Release();
+  pageView.Release()
+  image.Destroy();
+  mem.Destroy();
   
   return renderData;
 }
