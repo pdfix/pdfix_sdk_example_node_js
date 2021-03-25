@@ -1,29 +1,27 @@
 #!/bin/bash
 
-PDFIX_VERSION=6.5.0
-PDFIX_DIR="pdfix_sdk_${PDFIX_VERSION}_wasm"
+PDFIX_VERSION=6.9.0
+PDFIX_VERSION_TAG=3d8a5c85
+PDFIX_DIR="pdfix_sdk_${PDFIX_VERSION}_${PDFIX_VERSION_TAG}_wasm"
 ARCHIVE_FILENAME="${PDFIX_DIR}.zip"
 DOWNLOAD_URL="https://github.com/pdfix/pdfix_sdk_builds/releases/download/${PDFIX_VERSION}/${ARCHIVE_FILENAME}"
 
 if [ ! -d ./pdfix ]; then
-  info "pdfix does not exist. Creating directory..."
+  echo "pdfix does not exist. Creating directory..."
   mkdir ./pdfix
 fi
 
-pushd ./pdfix
+cd ./pdfix
 
 if [ ! -f ./$ARCHIVE_FILENAME ]; then
-  info "Archive not found. Downloading..."
+  echo "Archive not found. Downloading..."
   curl -OL $DOWNLOAD_URL
-  exit_if_error $? "Download Failed: ${DOWNLOAD_URL}"
 fi
 
-info "Cleaning directory..."
+echo "Cleaning directory..."
 find . -type f ! -name '*.zip' -delete
 find . -type l -delete
 
-info "Extracting: ${ARCHIVE_FILENAME}"
-unzip -jo $ARCHIVE_FILENAME "${PDFIX_DIR}/*"
+echo "Extracting: ${ARCHIVE_FILENAME}"
+unzip -jo $ARCHIVE_FILENAME "*"
 rm $ARCHIVE_FILENAME
-
-popd
