@@ -108,7 +108,8 @@ class Redact {
             pageView.RectToPage(devRect, pdfRect);
 
             // Create empty redact annotation and add it to the page
-            let redactAnnot = docPage.AddNewAnnot(-1, pdfRect, 26); // 'kAnnotRedact'
+            let redactAnnot = docPage.CreateAnnot(pdfRect, 26); // 'kAnnotRedact')
+            docPage.AddAnnot(-1, annot);
 
             // Notify before editing
             redactAnnot.NotifyWillChange("IC");

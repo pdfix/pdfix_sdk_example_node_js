@@ -71,6 +71,12 @@ const { pdfGetPageContent } = require(config.pdfixModulesPath + 'pdfGetPageConte
 const { pdfRedact } = require(config.pdfixModulesPath + 'pdfRedact.js');
 
 /**
+ * pdfToHtml module.
+ * @const {module} pdfToHtml
+ */
+const { pdfToHtml } = require(config.pdfixModulesPath + 'pdfToHtml.js');
+
+/**
  * WASM instance of the PDFix SDK.
  * @const {module} PDFIX_SDK
  */
@@ -166,7 +172,7 @@ function doSample() {
 
                 console.log("\nGetting page content... (page 1)");
                 pdfGetPageContent(PDFIX_SDK, pdfDoc, 1).then((pageContent) => {
-                  console.log(pageContent);
+                  // console.log(pageContent);    
 
                   console.log("\nCreating and applying sample redaction...");
                   let sampleRedactQuery = {
@@ -198,6 +204,9 @@ function doSample() {
                       }]
                     }]
                   };
+                  console.log(pdfDoc);
+                  pdfDoc.AcquirePage(0);
+
                   pdfRedact( PDFIX_SDK, pdfDoc, sampleRedactQuery ).then((data) => {
                     console.log(data);
                     let applyRedactionRequest = {
@@ -205,6 +214,10 @@ function doSample() {
                     };
                     pdfRedact( PDFIX_SDK, pdfDoc, applyRedactionRequest ).then((data) => {
                       console.log(data);
+
+                      // convert to html
+                      pdfToHtml(PDFIX_SDK, pdfDoc);
+
                     });
                   });
 

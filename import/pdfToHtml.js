@@ -12,29 +12,31 @@ function streamToString(sdk, toStrFunc, saveToStream){
 
 async function pdfToHtml(sdk, pdfDoc) {
   var pdfix = sdk.GetPdfix();
-  var accountAuth = pdfix.GetAccountAuthorization();
-  const [emailPtr, emailLength] = sdk.allocString('<---LICENSE EMAIL--->');
-  const [keyPtr, keyLength] = sdk.allocString('<---LICENSE KEY--->');
-  accountAuth.Authorize(emailPtr, keyPtr);
+  // var accountAuth = pdfix.GetAccountAuthorization();
+  // const [emailPtr, emailLength] = sdk.allocString('<---LICENSE EMAIL--->');
+  // const [keyPtr, keyLength] = sdk.allocString('<---LICENSE KEY--->');
+  // accountAuth.Authorize(emailPtr, keyPtr);
 
-  var pdfToHtml = sdk.GetPdfToHtml();
-  pdfToHtml.Initialize(pdfix);
-  var htmlDoc = pdfToHtml.OpenHtmlDoc(pdfDoc);
+  var pdfToHtmlConversion = pdfDoc.CreateHtmlConversion();
   var pdfHtmlParams = new sdk.PdfHtmlParams();
 
   pdfHtmlParams.flags |= sdk.kHtmlNoExternalCSS | sdk.kHtmlNoExternalJS | sdk.kHtmlNoExternalIMG | sdk.kHtmlNoExternalFONT | sdk.kHtmlNoPageRender;
 
-  /*
-  const docHtml = streamToString(sdk, Utils.fromUInt8Ptr, function(stream){
-    htmlDoc.SaveDocHtml(stream, pdfHtmlParams);
-  });
-  */
+  pdfToHtmlConversion.SetParams(pdfHtmlParams);
 
+  // save initial document node
+  // const docHtml = streamToString(sdk, Utils.fromUInt8Ptr, function(stream){
+  //   pdfToHtmlConversion.SaveDocHtml(stream, pdfHtmlParams);
+  // });
+
+  // convert only first page of the document if no pages added while document is converted
+  // pdfToHtmlConversion.AddPage(0)
   
   const pageHtml = streamToString(sdk, Utils.fromUInt8Ptr, function(stream){
-    htmlDoc.SavePageHtml(stream, pdfHtmlParams, 0);
+    pdfToHtmlConversion.SaveToStream(stream, 0);
   });
   
+  pdfToHtmlConversion.Destroy();
   
   /*
   const css = streamToString(sdk, Utils.fromUInt8Ptr, function(stream){

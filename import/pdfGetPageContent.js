@@ -67,9 +67,9 @@ class PdfExtractPageContent {
         let text = pdsText.GetText();
         let bbox = new this.sdk.PdfRect();
         pdsPageObject.GetBBox(bbox);
-  
+        
         let textState = new this.sdk.PdfTextState();
-        pdsText.GetTextState( pdsText.GetPage().GetDoc(), textState );
+        pdsText.GetTextState( textState );
   
         node["text"] = text;
         node["bbox"] = {
@@ -79,13 +79,17 @@ class PdfExtractPageContent {
           right: bbox.right
         };
         node["textState"] = {
-          fontName: textState.font.GetFontName(),
           fontSize: textState.font_size,
           charSpacing: textState.char_spacing,
           wordSpacing: textState.word_spacing,
-          sysFontName: textState.font.GetSystemFontName(),
-          isBold: textState.font.GetSystemFontBold(),
-          isItalic: textState.font.GetSystemFontItalic(),
+        };
+        if (textState.font.ptr) {
+          node["textState"] = {
+            fontName: textState.font.GetFontName(),
+            sysFontName: textState.font.GetSystemFontName(),
+            isBold: textState.font.GetSystemFontBold(),
+            isItalic: textState.font.GetSystemFontItalic(),
+          };
         }
       }
       
