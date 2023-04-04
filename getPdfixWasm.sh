@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PDFIX_VERSION=6.9.0
-PDFIX_VERSION_TAG=3d8a5c85
+PDFIX_VERSION=6.20.0
+PDFIX_VERSION_TAG=e464a0c7
 PDFIX_DIR="pdfix_sdk_${PDFIX_VERSION}_${PDFIX_VERSION_TAG}_wasm"
 ARCHIVE_FILENAME="${PDFIX_DIR}.zip"
 DOWNLOAD_URL="https://github.com/pdfix/pdfix_sdk_builds/releases/download/${PDFIX_VERSION}/${ARCHIVE_FILENAME}"
